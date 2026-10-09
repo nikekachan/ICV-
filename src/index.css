@@ -367,6 +367,16 @@ input {
   margin-bottom: 10px;
 }
 
+.retry-link {
+  border: none;
+  background: none;
+  color: var(--danger);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+}
+
 .quiz-play {
   display: flex;
   flex-direction: column;

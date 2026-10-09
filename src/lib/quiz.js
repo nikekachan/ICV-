@@ -1,5 +1,3 @@
-import { getVocabList } from './storage';
-
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -10,8 +8,7 @@ function shuffle(arr) {
 }
 
 // direction: 'random' | 'word-to-meaning' | 'meaning-to-word'
-export function buildQuiz(userId, { direction = 'random', count = 10 } = {}) {
-  const list = getVocabList(userId);
+export function buildQuiz(list, { direction = 'random', count = 10 } = {}) {
   if (list.length < 3) return [];
 
   const pool = shuffle(list);

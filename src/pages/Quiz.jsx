@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NavBar from '../components/NavBar';
 import { USERS } from '../lib/users';
 import { buildQuiz } from '../lib/quiz';
+import { fetchVocabList } from '../lib/api';
 
 const DIRECTIONS = [
   { id: 'random', label: 'ランダム' },
@@ -22,20 +23,29 @@ export default function Quiz() {
   const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong'
   const [score, setScore] = useState(0);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function startQuiz() {
-    const qs = buildQuiz(sourceId, { direction, count: QUESTION_COUNT });
-    if (qs.length === 0) {
-      setError('出題するには、単語を3つ以上登録してください。');
-      return;
-    }
+  async function startQuiz() {
     setError('');
-    setQuestions(qs);
-    setIndex(0);
-    setScore(0);
-    setSelected(null);
-    setFeedback(null);
-    setStage('playing');
+    setLoading(true);
+    try {
+      const list = await fetchVocabList(sourceId);
+      const qs = buildQuiz(list, { direction, count: QUESTION_COUNT });
+      if (qs.length === 0) {
+        setError('出題するには、単語を3つ以上登録してください。');
+        return;
+      }
+      setQuestions(qs);
+      setIndex(0);
+      setScore(0);
+      setSelected(null);
+      setFeedback(null);
+      setStage('playing');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleChoice(choice) {
@@ -112,8 +122,9 @@ export default function Quiz() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={startQuiz}
+              disabled={loading}
             >
-              クイズをはじめる
+              {loading ? '読み込み中…' : 'クイズをはじめる'}
             </motion.button>
           </motion.div>
         )}
